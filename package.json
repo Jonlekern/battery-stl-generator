@@ -1,0 +1,24 @@
+{
+  "name": "battery-stl-generator",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Générateur d'inserts de tiroir pour piles, imprimables en 3D",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "e2e": "playwright test --trace off"
+  },
+  "dependencies": {
+    "preact": "^11.2.0"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.6",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
+  }
+}
