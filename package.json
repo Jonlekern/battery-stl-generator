@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@expo-google-fonts/arimo": "^0.4.3",
+    "fflate": "^0.8.3",
     "openscad-wasm-prebuilt": "1.2.0",
     "preact": "^11.2.0"
   },
