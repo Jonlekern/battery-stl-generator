@@ -63,7 +63,7 @@ Chaque module a un seul rôle et une interface claire.
 | `placement` | TypeScript, fonctions pures | Calcule les zones et les avertissements | `catalogue` |
 | `scad` | TypeScript, fonctions pures | Transforme un plan en fichier `.scad` autonome | `placement` (types) |
 | `insert_piles.scad` | OpenSCAD | Dessine la géométrie à partir de la liste de zones | rien |
-| `moteur` | Web Worker + OpenSCAD WASM | Exécute un `.scad` et rend un maillage | `openscad-wasm` |
+| `moteur` | Web Worker + OpenSCAD WASM | Exécute un `.scad` et rend un maillage | `openscad-wasm-prebuilt` |
 | `apercu` | SVG + Three.js | Plan 2D et vue 3D | `placement` (types) |
 | `export` | TypeScript | Fabrique les fichiers STL, 3MF et `.scad` | `moteur`, `scad` |
 | `interface` | Preact | Formulaire, messages, boutons | tous |
@@ -81,7 +81,7 @@ aucun calcul de placement : il reçoit des zones déjà positionnées. Cette
 séparation permet de tester le placement sans OpenSCAD, et de garder le
 fichier `.scad` lisible.
 
-Stack : Vite, TypeScript, Preact, Three.js, `openscad-wasm`, Vitest,
+Stack : Vite, TypeScript, Preact, Three.js, `openscad-wasm-prebuilt`, Vitest,
 Playwright.
 
 ### Types principaux
@@ -225,8 +225,10 @@ grille 4 × 2 donne 8 alvéoles. La page affiche le nombre réel d'alvéoles.
    (colonnes × rangées, dans les deux orientations) qui tiennent dans la
    surface utile.
 3. Ranger les zones en rangées dans le tiroir. Essayer plusieurs combinaisons
-   de formes et garder la disposition valide dont le rectangle englobant est
-   le plus petit.
+   de formes et garder la disposition valide dont le rectangle englobant a le
+   plus petit demi-périmètre (largeur + profondeur). Ce critère favorise les
+   formes proches du carré : 12 AA donnent une grille 4 × 3, pas une bande
+   1 × 12.
 4. Traiter l'espace restant selon le mode choisi.
 
 L'algorithme est déterministe : la même demande donne toujours le même plan.
@@ -240,14 +242,16 @@ L'algorithme est déterministe : la même demande donne toujours le même plan.
 - **`plus`** : l'insert a la taille de la surface utile. Chaque rectangle
   libre reçoit la plus grande grille possible du type choisi.
 
-Dans les modes `usagees` et `plus`, la surface qui reste libre est une simple
-plaque de l'épaisseur du fond.
+Dans tous les modes, une plaque de l'épaisseur du fond couvre toute la surface
+de l'insert. L'insert est donc toujours un rectangle plein, même si les zones
+ne le remplissent pas entièrement.
 
 ### Erreurs bloquantes
 
 - La demande ne rentre pas : le message liste les types qui ne passent pas.
 - Saisie hors limites : tiroir entre 30 et 1000 mm par côté, hauteur entre 10
-  et 500 mm, quantité entre 0 et 500 par type, au moins une pile demandée.
+  et 500 mm, quantité entre 0 et 500 par type, au moins une pile demandée
+  (sauf en mode `plus`, qui peut remplir un tiroir à lui seul).
 
 ### Avertissements non bloquants
 
@@ -275,7 +279,9 @@ plaque de l'épaisseur du fond.
 | Bouton | Fente à fond arrondi, largeur = épaisseur + jeu | 55 % du diamètre |
 
 - Le jeu s'ajoute au diamètre, ou à chaque côté pour les rectangulaires.
-- Chanfrein de 0,6 mm en haut de chaque alvéole.
+- Chanfrein en haut des alvéoles cylindriques et rectangulaires. Il vaut
+  0,6 mm au maximum et un quart de la paroi au plus, pour ne pas réduire la
+  paroi à une arête. Les fentes de piles bouton n'ont pas de chanfrein.
 - `profondeurPct` vaut 40 par défaut et se règle entre 20 et 80. La
   profondeur des fentes de piles bouton est fixe.
 
@@ -285,14 +291,16 @@ plaque de l'épaisseur du fond.
   diamètre sur le quart extérieur de la fente. Les bords de la pile sont ainsi
   dégagés pour la pincer.
 - Rectangulaires : une encoche demi-cylindrique de 7 mm de rayon, centrée sur
-  chaque petit côté de la poche.
+  chaque petit côté de la poche, profonde de la moitié de l'alvéole.
+- Les découpes d'une zone ne débordent jamais sur la zone voisine.
 - Cylindriques : aucune encoche.
 
 ### Étiquettes
 
 - Texte = nom court de la pile (« AA », « CR2032 »), sur la bande avant de la
   zone.
-- Police : Liberation Sans Bold.
+- Police : Liberation Sans Bold, fournie avec OpenSCAD sur PC. Dans le
+  navigateur, c'est Arimo Bold qui la remplace : même dessin, licence libre.
 - Relief : +0,6 mm au-dessus de la surface. Gravé : −0,6 mm.
 - La taille du texte s'adapte à la largeur de la zone, avec un maximum de
   6 mm de haut.
@@ -301,7 +309,7 @@ plaque de l'épaisseur du fond.
 
 - Bac ouvert, parois de 1,6 mm, hauteur égale à celle de la zone la plus
   haute.
-- Étiquette « USAGÉES ».
+- Étiquette « USAGÉES » sur le fond du bac, à l'avant.
 
 ### Format du `.scad` généré
 
@@ -398,22 +406,26 @@ Les tests et le build tournent à chaque push (GitHub Actions).
 - Pendant le développement : publication de test sur GitHub Pages.
 - Version finale : le dossier est déposé sur le site de Johnny.
 
-## 13. Points à vérifier en premier
+## 13. Hypothèses techniques
 
-Ces points sont des hypothèses. Le plan d'implémentation commence par les
-vérifier, parce qu'un échec change la suite.
+Vérifiées le 13 novembre 2026 par un essai sous Node :
 
-1. **`openscad-wasm`** : le paquet npm existe (version 0.0.4, environ 14 Mo).
-   À confirmer : il tourne dans un Web Worker et sous Node, et il propose le
-   mode de rendu rapide Manifold.
-2. **Polices** : la fonction `text()` a besoin d'un fichier de police dans le
-   système de fichiers virtuel. À confirmer avec Liberation Sans Bold, y
-   compris le « É » de « USAGÉES ».
-3. **Performance** : temps de calcul d'un grand insert (environ 800 alvéoles).
-   Objectif : moins de 10 secondes sur un PC courant.
-4. **3MF** : l'import en deux pièces dans Bambu Studio et PrusaSlicer. Ce test
+1. **Moteur** : `openscad-wasm-prebuilt` 1.2.0 (11 Mo) fonctionne, avec le
+   rendu rapide Manifold. Le paquet `openscad-wasm` 0.0.4 est écarté : il
+   plante dès qu'une police est chargée. Chaque rendu demande une instance
+   neuve du moteur.
+2. **Polices** : `text()` fonctionne avec Arimo Bold déclarée sous le nom
+   « Liberation Sans », y compris le « É » de « USAGÉES ».
+3. **Performance** : 825 alvéoles dans une plaque de 400 × 300 mm se calculent
+   en 3,4 secondes.
+
+Restent à vérifier :
+
+4. **Navigateur** : le moteur dans un Web Worker. C'est la troisième tâche du
+   plan d'implémentation.
+5. **3MF** : l'import en deux pièces dans Bambu Studio et PrusaSlicer. Ce test
    est manuel et revient à Johnny.
-5. **Licence** : OpenSCAD est sous licence GPL. La page doit le mentionner et
+6. **Licence** : OpenSCAD est sous licence GPL. La page doit le mentionner et
    donner un lien vers ses sources. La licence du projet lui-même reste à
    choisir.
 
