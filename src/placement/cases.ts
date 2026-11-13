@@ -122,3 +122,14 @@ export function hauteurTexte(texte: string, largeurDispo: number): number | null
   const h = Math.min(C.TEXTE_MAX, ajustee);
   return h < C.TEXTE_MIN ? null : arrondir(h);
 }
+
+/**
+ * Centre de l'alvéole (colonne i, rangée j) d'une zone, dans le repère de la
+ * zone. Même formule que `centre_alveole` dans insert_piles.scad.
+ */
+export function centreAlveole(c: Case, o: Options, i: number, j: number): { x: number; y: number } {
+  return {
+    x: arrondir(o.paroi / 2 + (i + 0.5) * c.pasX),
+    y: arrondir(bandeEtiquette(o) + o.paroi / 2 + (j + 0.5) * c.pasY),
+  };
+}
