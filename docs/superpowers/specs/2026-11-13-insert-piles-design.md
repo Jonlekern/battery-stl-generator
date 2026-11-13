@@ -223,7 +223,8 @@ grille 4 × 2 donne 8 alvéoles. La page affiche le nombre réel d'alvéoles.
 1. Surface utile = tiroir moins 1 mm de jeu sur chaque dimension.
 2. Pour chaque type demandé, lister les formes de grille possibles
    (colonnes × rangées, dans les deux orientations) qui tiennent dans la
-   surface utile.
+   surface utile. Si les étiquettes sont activées et qu'au moins une forme est
+   assez large pour porter la sienne, seules ces formes sont gardées.
 3. Ranger les zones en rangées dans le tiroir. Essayer plusieurs combinaisons
    de formes et garder la disposition valide dont le rectangle englobant a le
    plus petit demi-périmètre (largeur + profondeur). Ce critère favorise les
@@ -292,7 +293,8 @@ ne le remplissent pas entièrement.
   dégagés pour la pincer.
 - Rectangulaires : une encoche demi-cylindrique de 7 mm de rayon, centrée sur
   chaque petit côté de la poche, profonde de la moitié de l'alvéole.
-- Les découpes d'une zone ne débordent jamais sur la zone voisine.
+- Les découpes d'une zone ne débordent jamais sur la zone voisine, ni sur sa
+  propre bande d'étiquette.
 - Cylindriques : aucune encoche.
 
 ### Étiquettes
@@ -360,10 +362,15 @@ Deux colonnes sur grand écran, une seule sur téléphone.
 **Colonne du résultat**
 
 - Erreurs et avertissements.
-- Plan 2D (SVG), mis à jour à chaque changement.
+- Résumé : dimensions de l'insert et nombre d'alvéoles.
+- Boutons de téléchargement : STL, 3MF, `.scad`.
 - Aperçu 3D (Three.js), corps en gris et étiquettes en couleur, avec un
   indicateur pendant le calcul.
-- Boutons de téléchargement : STL, 3MF, `.scad`.
+- Plan 2D (SVG), mis à jour à chaque changement.
+
+Sur grand écran, cette colonne reste visible pendant qu'on règle. Sur
+téléphone, elle se trouve sous les réglages : un bandeau fixé en bas de
+l'écran résume le résultat et y conduit.
 
 Le recalcul 3D part 500 ms après le dernier changement. Un calcul devenu
 inutile est abandonné. Les derniers réglages sont mémorisés dans le
@@ -419,10 +426,11 @@ Vérifiées le 13 novembre 2026 par un essai sous Node :
 3. **Performance** : 825 alvéoles dans une plaque de 400 × 300 mm se calculent
    en 3,4 secondes.
 
+4. **Navigateur** : le moteur tourne dans un Web Worker, sur le build de
+   production (vérifié sous Chromium par un test automatique).
+
 Restent à vérifier :
 
-4. **Navigateur** : le moteur dans un Web Worker. C'est la troisième tâche du
-   plan d'implémentation.
 5. **3MF** : l'import en deux pièces dans Bambu Studio et PrusaSlicer. Ce test
    est manuel et revient à Johnny.
 6. **Licence** : OpenSCAD est sous licence GPL. La page doit le mentionner et
