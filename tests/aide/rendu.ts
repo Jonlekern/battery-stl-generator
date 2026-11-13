@@ -23,7 +23,12 @@ export function planOk(d: Demande): PlanOk {
   return plan;
 }
 
-/** Calcule le plan, génère le .scad et le rend avec le vrai OpenSCAD. */
-export async function rendreDemande(d: Demande, piece: Piece): Promise<Maillage> {
-  return lireStl(await rendre(genererScad(planOk(d), d), piece, chargerPolice()));
+/** Génère le .scad d'un plan et le rend avec le vrai OpenSCAD. */
+export async function rendrePlan(plan: PlanOk, d: Demande, piece: Piece): Promise<Maillage> {
+  return lireStl(await rendre(genererScad(plan, d), piece, chargerPolice()));
+}
+
+/** Calcule le plan d'une demande, puis le rend. */
+export function rendreDemande(d: Demande, piece: Piece): Promise<Maillage> {
+  return rendrePlan(planOk(d), d, piece);
 }

@@ -74,6 +74,11 @@ function ligneZone(z: Zone, d: Demande): string {
   return `  [${champs.join(', ')}],`;
 }
 
+/** Vrai si la pièce « etiquettes » contient quelque chose à rendre. */
+export function aDesEtiquettes(plan: PlanOk): boolean {
+  return plan.zones.some((z) => z.etiquette !== undefined);
+}
+
 /** Produit un fichier .scad autonome : paramètres, zones, puis la bibliothèque. */
 export function genererScad(plan: PlanOk, d: Demande): string {
   const o = d.options;
