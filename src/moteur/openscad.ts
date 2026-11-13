@@ -1,16 +1,8 @@
 import { createOpenSCAD } from 'openscad-wasm-prebuilt';
 import type { Piece } from '../types';
+import { ErreurOpenScad } from './erreurs';
 
-/** Échec d'un rendu. `journal` contient la sortie d'OpenSCAD. */
-export class ErreurOpenScad extends Error {
-  journal: string[];
-
-  constructor(message: string, journal: string[]) {
-    super(message);
-    this.name = 'ErreurOpenScad';
-    this.journal = journal;
-  }
-}
+export { ErreurOpenScad };
 
 // Arimo Bold a le même dessin que Liberation Sans Bold, la police fournie avec
 // OpenSCAD sur PC. On la déclare sous ce nom pour que le même .scad donne le
