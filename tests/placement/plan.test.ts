@@ -56,6 +56,19 @@ describe('calculerPlan : mode « rien »', () => {
     expect(plan.avertissements).toEqual([]);
   });
 
+  it('préfère une forme assez large pour porter son étiquette', () => {
+    // 6 CR2032 tiendraient dans une bande de 10,8 mm de large, sans place pour « CR2032 ».
+    const plan = planOk(demande({ quantites: MIXTE }));
+    expect(plan.avertissements).toEqual([]);
+    for (const z of plan.zones) expect(z.etiquette, z.pileId).toBeDefined();
+  });
+
+  it('garde une forme sans étiquette quand aucune n\'est assez large', () => {
+    const plan = planOk(demande({ quantites: { cr2032: 1 } }));
+    expect(plan.zones).toHaveLength(1);
+    expect(plan.zones[0].etiquette).toBeUndefined();
+  });
+
   it('rend le même plan pour la même demande', () => {
     expect(calculerPlan(demande({ quantites: MIXTE }))).toEqual(calculerPlan(demande({ quantites: MIXTE })));
   });

@@ -72,10 +72,13 @@ export function calculerPlan(d: Demande): Plan {
     profondeur: arrondir(d.tiroir.profondeur - C.JEU_TIROIR),
   };
 
-  const candidats: Candidat[] = demandees.map(({ pile, quantite }) => ({
-    pileId: pile.id,
-    formes: formesPossibles(pile, quantite, o, utile),
-  }));
+  const candidats: Candidat[] = demandees.map(({ pile, quantite }) => {
+    const formes = formesPossibles(pile, quantite, o, utile);
+    // Quand c'est possible, on ne garde que les formes assez larges pour leur étiquette.
+    const lisibles =
+      o.etiquettes === 'aucune' ? formes : formes.filter((f) => hauteurTexte(pile.nom, f.largeur) !== null);
+    return { pileId: pile.id, formes: lisibles.length > 0 ? lisibles : formes };
+  });
   const rangement = ranger(candidats, utile);
   if (!rangement.ok) {
     return { ok: false, erreurs: [{ code: 'ne_rentre_pas', pileIds: rangement.nonPlaces }] };

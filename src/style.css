@@ -1,0 +1,475 @@
+:root {
+  --fond-page: #f4f5f7;
+  --fond-carte: #ffffff;
+  --texte: #1c2330;
+  --texte-doux: #5b6577;
+  --bordure: #d7dce4;
+  --couleur-accent: #d9480f;
+  --accent-texte: #ffffff;
+  --couleur-corps: #b9c0c9;
+  --plan-plaque: #e6e9ee;
+  --plan-zone: #cfd5de;
+  --plan-usagees: #e9d8c8;
+  --erreur-fond: #fdecec;
+  --erreur-texte: #9b1c1c;
+  --alerte-fond: #fff4dd;
+  --alerte-texte: #7a4b00;
+  --rayon: 10px;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond-page: #14171c;
+    --fond-carte: #1e232b;
+    --texte: #e8ebf0;
+    --texte-doux: #9aa4b5;
+    --bordure: #343b47;
+    --couleur-accent: #ff7a3d;
+    --accent-texte: #1a0f08;
+    --couleur-corps: #8d96a3;
+    --plan-plaque: #2a303a;
+    --plan-zone: #3b4350;
+    --plan-usagees: #4a3d31;
+    --erreur-fond: #3b1d1d;
+    --erreur-texte: #ffb4b4;
+    --alerte-fond: #3a2e12;
+    --alerte-texte: #ffd88a;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--fond-page);
+  color: var(--texte);
+  font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.entete h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  letter-spacing: -0.01em;
+}
+
+.entete p {
+  margin: 4px 0 16px;
+  color: var(--texte-doux);
+}
+
+.colonnes {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 900px) {
+  .colonnes {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  /* La colonne du résultat reste à l'écran pendant qu'on règle. Si elle est
+     plus haute que l'écran, elle défile seule : rien n'est hors d'atteinte. */
+  .resultat {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+/* --- Formulaire ---------------------------------------------------------- */
+
+.formulaire {
+  display: grid;
+  gap: 12px;
+}
+
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 14px 16px 16px;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  background: var(--fond-carte);
+}
+
+legend {
+  padding: 0 6px;
+  font-weight: 650;
+}
+
+.aide {
+  margin: 0 0 10px;
+  color: var(--texte-doux);
+  font-size: 0.9rem;
+}
+
+.grille-champs {
+  display: grid;
+  gap: 10px 12px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+}
+
+.champ {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+
+.champ label {
+  font-size: 0.9rem;
+  color: var(--texte-doux);
+}
+
+input[type='text'],
+select {
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  background: var(--fond-page);
+  color: inherit;
+  font: inherit;
+}
+
+input[aria-invalid='true'] {
+  border-color: var(--erreur-texte);
+  background: var(--erreur-fond);
+}
+
+.erreur-champ {
+  color: var(--erreur-texte);
+}
+
+:focus-visible {
+  outline: 2px solid var(--couleur-accent);
+  outline-offset: 2px;
+}
+
+.famille,
+.avance {
+  margin-top: 10px;
+  border-top: 1px solid var(--bordure);
+  padding-top: 8px;
+}
+
+.famille:first-of-type {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+summary {
+  cursor: pointer;
+  padding: 6px 0;
+  font-weight: 600;
+}
+
+.pastille {
+  display: inline-block;
+  min-width: 1.5em;
+  margin-left: 8px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--couleur-accent);
+  color: var(--accent-texte);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.grille-compteurs {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  margin-top: 6px;
+}
+
+.compteur {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 6px 6px 10px;
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+}
+
+.compteur-actif {
+  border-color: var(--couleur-accent);
+}
+
+.compteur-libelle {
+  min-width: 0;
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
+
+.compteur-boutons {
+  display: flex;
+  flex: none;
+  gap: 4px;
+}
+
+.compteur-boutons input {
+  width: 3.4em;
+  min-height: 36px;
+  padding: 4px;
+  text-align: center;
+}
+
+.compteur-boutons button {
+  width: 36px;
+  min-height: 36px;
+  padding: 0;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.choix {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.choix label,
+.case {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.choix input,
+.case input {
+  margin-top: 5px;
+  accent-color: var(--couleur-accent);
+}
+
+.case {
+  margin-top: 12px;
+}
+
+/* --- Boutons ------------------------------------------------------------- */
+
+button {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  background: var(--fond-carte);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--couleur-accent);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.principal {
+  border-color: var(--couleur-accent);
+  background: var(--couleur-accent);
+  color: var(--accent-texte);
+  font-weight: 650;
+}
+
+/* --- Résultat ------------------------------------------------------------ */
+
+.resultat {
+  display: grid;
+  /* minmax(0, …) : un contenu large (le canevas 3D) ne peut pas élargir la colonne. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+}
+
+.messages {
+  display: grid;
+  gap: 8px;
+}
+
+.message {
+  margin: 0;
+  padding: 10px 14px 10px 30px;
+  border-radius: var(--rayon);
+}
+
+.message-erreur {
+  background: var(--erreur-fond);
+  color: var(--erreur-texte);
+}
+
+.message-avertissement {
+  background: var(--alerte-fond);
+  color: var(--alerte-texte);
+}
+
+.resume {
+  margin: 0;
+}
+
+.cadre {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  background: var(--fond-carte);
+}
+
+.cadre figcaption {
+  margin-top: 8px;
+  color: var(--texte-doux);
+  font-size: 0.85rem;
+}
+
+.plan2d {
+  display: block;
+  width: 100%;
+  max-height: 32vh;
+}
+
+.plan2d .plaque {
+  fill: var(--plan-plaque);
+}
+
+.plan2d .zone {
+  fill: var(--plan-zone);
+  stroke: var(--fond-carte);
+  stroke-width: 0.6;
+}
+
+.plan2d .zone-usagees {
+  fill: var(--plan-usagees);
+}
+
+.plan2d .alveole {
+  fill: var(--fond-carte);
+}
+
+.plan2d .etiquette {
+  fill: var(--couleur-accent);
+  font-family: Arial, 'Liberation Sans', sans-serif;
+  font-weight: 700;
+}
+
+.vue3d {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 36vh;
+  overflow: hidden;
+  border-radius: 6px;
+  background: radial-gradient(circle at 50% 35%, var(--fond-carte), var(--fond-page));
+  touch-action: none;
+}
+
+/* Le canevas remplit son cadre sans jamais en dicter la taille : three.js lui
+   donne une largeur fixe en pixels, qui sinon élargirait la page. */
+.vue3d canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.vue3d-message {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 4px 12px;
+  border: 1px solid var(--bordure);
+  border-radius: 999px;
+  background: var(--fond-carte);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.telechargements {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pied {
+  margin-top: 24px;
+  color: var(--texte-doux);
+  font-size: 0.85rem;
+}
+
+.pied a {
+  color: inherit;
+}
+
+/* --- Bandeau de résumé (téléphone) ------------------------------------------ */
+
+.bandeau {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--bordure);
+  background: var(--fond-carte);
+  color: inherit;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.bandeau strong {
+  flex: none;
+  color: var(--couleur-accent);
+}
+
+/* Le bandeau ne doit pas masquer le bas de la page. */
+.page {
+  padding-bottom: 72px;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@media (min-width: 900px) {
+  .bandeau {
+    display: none;
+  }
+
+  .page {
+    padding-bottom: 16px;
+  }
+}
